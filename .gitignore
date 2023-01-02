@@ -1,0 +1,6 @@
+
+*.xcworkspacedata
+PermissionCheck.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+PermissionCheck.xcodeproj/xcuserdata/umcios.xcuserdatad/xcschemes/xcschememanagement.plist
+PermissionCheck.xcodeproj/project.xcworkspace/xcuserdata/umcios.xcuserdatad/UserInterfaceState.xcuserstate
+.DS_Store
