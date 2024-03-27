@@ -27,13 +27,9 @@ class ViewController: UIViewController {
         
         //Usage
         checkPermission()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(enterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
-    }
-
-    @objc private func enterForeground() {
         checkPermission()
     }
+
 
     func showAlert(title: String, message: String, confim: UIAlertAction, cancel: UIAlertAction? = nil) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -77,19 +73,20 @@ extension ViewController {
                 status = await checkAudioPermission()
             case .location:
                 errMsg = "위치 접근 권한 필요합니다."
-                status = await LocationManager.checkLocationPermission()
+                status = await LocationManager().checkLocationPermission()
             }
-            
             if status == .denied, permission.requirement == .required {
-                showAlert(title: "권한 알림",
-                          message: errMsg,
-                          confim: UIAlertAction(title: "설정하기", style: .default) { action in
-                                    let url = URL(string: UIApplication.openSettingsURLString)!
-                                    UIApplication.shared.open(url) },
-                          cancel: UIAlertAction(title: "앱 종료", style: .cancel) { action in
-                                    exit(0)})
+                let value = await withUnsafeContinuation { [weak self] continuation in
+                    self?.showAlert(title: "권한 알림",
+                              message: errMsg,
+                              confim: UIAlertAction(title: "설정하기", style: .default) {  action in
+                        let url = URL(string: UIApplication.openSettingsURLString)!
+                        UIApplication.shared.open(url)
+                        continuation.resume(returning: false)},
+                              cancel: UIAlertAction(title: "앱 종료", style: .cancel) { action in
+                        exit(0)})
+                }
                 print("on denied requiredPermission")
-                return false
             }
         }
         return true

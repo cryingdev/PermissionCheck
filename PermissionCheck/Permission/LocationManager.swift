@@ -9,16 +9,14 @@ import Foundation
 import CoreLocation
 
 class LocationManager: NSObject, CLLocationManagerDelegate {
-    
-    static var shared = LocationManager()
-    
+ 
     //PermissionAgent에서 옮겨옴
     private var locationManager: CLLocationManager!
     private var authorizationStatusBlock: ((CLAuthorizationStatus) -> ())?
     
-    static func checkLocationPermission() async -> Permission.Status {
-        return await withCheckedContinuation { continuation in
-            LocationManager.shared.requestLocationPermission { auth in
+    func checkLocationPermission() async -> Permission.Status {
+        return await withCheckedContinuation { [weak self] continuation in
+            self?.requestLocationPermission { auth in
                 switch auth {
                 case .notDetermined:
                     continuation.resume(returning: .notDetermined)
@@ -32,7 +30,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                     continuation.resume(returning: .notDetermined)
                 }
                 //continuation call 중복호출 방지
-                LocationManager.shared.authorizationStatusBlock = nil
+                self?.authorizationStatusBlock = nil
             }
         }
     }
